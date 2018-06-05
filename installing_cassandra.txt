@@ -1,0 +1,47 @@
+### Cassandra install notes
+
+
+ cat /etc/issue
+ echo "deb http://www.apache.org/dist/cassandra/debian 311x main" | sudo tee -a /etc/apt/sources.list.d/cassandra.sources.list
+ curl https://www.apache.org/dist/cassandra/KEYS | sudo apt-key add -
+ sudo apt-get update
+ sudo apt-get install cassandra  -y
+ 
+ 
+ 
+ ### On MAC machine
+ 
+ You can also use the curl command on Mac to directly download the files to your machine. For example, to download the DataStax Community Server, you could enter the following at terminal prompt:
+ 
+ curl -OL http://downloads.datastax.com/community/dsc.tar.gz
+ 
+ tar -xzf dsc-cassandra-1.2.2-bin.tar.gz
+ 
+ ==== After installation run these commands to check if Cassandra is running propery===
+ 
+ ls /etc/cassandra
+ service cassandra status
+ /var/log/cassandra
+ 
+ 
+  531  service  cassandra status
+  532  service  cassandra stop
+  533  sudo service  cassandra stop
+  534  service  cassandra stop
+  535  sudo service  cassandra status
+  536  sudo service  cassandra start
+  537  nodetool status
+  
+  
+  
+  
+  netstat -nltp
+  ls /var/log/cassandra/
+  tail -100 /var/log/cassandra/system.log | less
+  rm -rf /var/lib/cassandra/data/*
+  nodetool status
+  
+  
+  
+ 
+ 

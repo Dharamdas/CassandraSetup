@@ -1,0 +1,115 @@
+1. Stop Cassandra-daemon-
+sudo service cassandra stop
+
+2. Delete the default dataset:
+sudo rm -rf /var/lib/cassandra/data/system/*
+
+3. Edit the cassandra.yaml file as follows-
+sudo vim /etc/cassandra/cassandra.yaml
+
+   1.1 ===== to get the inet address use below commmands
+
+hadoop@ip-172-31-93-33:/etc$ ifconfig eth0 eth0      
+          Link encap:Ethernet  HWaddr 12:92:17:08:fa:4c
+          inet addr:172.31.93.33  Bcast:172.31.95.255  Mask:255.255.240.0
+          inet6 addr: fe80::1092:17ff:fe08:fa4c/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:9001  Metric:1
+          RX packets:252043 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:232487 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          RX bytes:68371727 (68.3 MB)  TX bytes:33990248 (33.9 MB)
+          
+          
+4. The contents should look like the below:
+
+-- cluster_name: 'CassandraDOCluster'
+-- listen_address: your_server_ip
+		listen_address: 172.31.93.33
+-- rpc_address: your_server_ip
+      rpc_address: 172.31.93.33
+-- endpoint_snitch: GossipingPropertyFileSnitch
+seed_provider:
+    # Addresses of hosts that are deemed contact points.
+    # Cassandra nodes use this list of hosts to find each other and learn
+    # the topology of the ring.  You must change this if you are running
+    # multiple nodes!
+    - class_name: org.apache.cassandra.locator.SimpleSeedProvider
+      parameters:
+          # seeds is actually a comma-delimited list of addresses.
+          # Ex: "<ip1>,<ip2>,<ip3>"
+          - seeds: "172.31.95.115"   (IP address of Bootstrap node or coordinator node)
+
+at the end of the cassandra.yaml file add the following :
+ --- auto_bootstrap: false
+edit the file below
+-- sudo vim /etc/cassandra/cassandra-env.sh
+search for hostname and place your IP address in it
+
+
+5. Restart the cassandra-daemon sudo service cassandra start
+sudo service cassandra restart
+
+6. Check status of the cluster
+sudo nodetool status
+sudo nodetool status <keyspace-name> (if the keyspaces
+don't have the same replication factor)
+
+
+
+#### To setup multi node cluster
+      we need to keep same configuration and every node should have identical cassnadra.yaml file
+      and seed node need to mention for every new node we are bringing up
+      
+After setting up Cassandra requests will look like below
+
+adoop@ip-172-31-93-33:/var/lib/cassandra/data$ service  cassandra status
+ * Cassandra is running
+hadoop@ip-172-31-93-33:/var/lib/cassandra/data$ nodetool status
+Datacenter: dc1
+===============
+Status=Up/Down
+|/ State=Normal/Leaving/Joining/Moving
+--  Address        Load       Tokens       Owns    Host ID                               Rack
+UN  172.31.93.79   174.94 KiB  256          ?       b4949a19-95ed-43ce-8851-ff19ca47b4b4  rack1
+UN  172.31.95.115  282.38 KiB  256          ?       706d657f-5c0f-43c3-ac97-7d82e3cfeae4  rack1
+UN  172.31.93.33   312.14 KiB  256          ?       9a66b26c-89de-4646-9986-d6587adb714a  rack1
+UN  172.31.84.113  188.99 KiB  256          ?       af07b6fe-5197-4ab0-9065-2cf9d5c95b2a  rack1
+
+hadoop@ip-172-31-93-33:/etc$ nodetool status dinesh_target   (With Replication Factor 1 and 4 nodes)
+Datacenter: dc1
+===============
+Status=Up/Down
+|/ State=Normal/Leaving/Joining/Moving
+--  Address        Load       Tokens       Owns (effective)  Host ID                               Rack
+UN  172.31.93.79   174.94 KiB  256          24.3%             b4949a19-95ed-43ce-8851-ff19ca47b4b4  rack1
+UN  172.31.95.115  282.38 KiB  256          26.3%             706d657f-5c0f-43c3-ac97-7d82e3cfeae4  rack1
+UN  172.31.93.33   312.14 KiB  256          25.9%             9a66b26c-89de-4646-9986-d6587adb714a  rack1
+UN  172.31.84.113  188.99 KiB  256          23.5%             af07b6fe-5197-4ab0-9065-2cf9d5c95b2a  rack1
+
+
+
+hadoop@ip-172-31-93-33:/etc$ nodetool status dinesh_target1  (With Replication Factor 2 and 4 nodes)
+Datacenter: dc1
+===============
+Status=Up/Down
+|/ State=Normal/Leaving/Joining/Moving
+--  Address        Load       Tokens       Owns (effective)  Host ID                               Rack
+UN  172.31.93.79   174.94 KiB  256          50.0%             b4949a19-95ed-43ce-8851-ff19ca47b4b4  rack1
+UN  172.31.95.115  282.38 KiB  256          52.1%             706d657f-5c0f-43c3-ac97-7d82e3cfeae4  rack1
+UN  172.31.93.33   312.14 KiB  256          48.3%             9a66b26c-89de-4646-9986-d6587adb714a  rack1
+UN  172.31.84.113  188.99 KiB  256          49.6%             af07b6fe-5197-4ab0-9065-2cf9d5c95b2a  rack1
+
+
+hadoop@ip-172-31-93-33:/etc$ nodetool status dinesh_target2      (With Replication Factor 3 and 4 nodes)
+Datacenter: dc1
+===============
+Status=Up/Down
+|/ State=Normal/Leaving/Joining/Moving
+--  Address        Load       Tokens       Owns (effective)  Host ID                               Rack
+UN  172.31.93.79   174.94 KiB  256          79.2%             b4949a19-95ed-43ce-8851-ff19ca47b4b4  rack1
+UN  172.31.95.115  282.38 KiB  256          72.5%             706d657f-5c0f-43c3-ac97-7d82e3cfeae4  rack1
+UN  172.31.93.33   312.14 KiB  256          72.8%             9a66b26c-89de-4646-9986-d6587adb714a  rack1
+UN  172.31.84.113  188.99 KiB  256          75.5%             af07b6fe-5197-4ab0-9065-2cf9d5c95b2a  rack1
+
+
+

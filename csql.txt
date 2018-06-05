@@ -1,0 +1,111 @@
+createe keyspace dharam_taget with replication={'class':'SimpleStrategy', 'replication_factor':1};
+
+describe dharam_taget;
+
+CREATE KEYSPACE dharam_taget WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'}  AND durable_writes = true;
+
+use dharam_taget;
+create table user_profile(id int primary key, first_name text,last_name text,slary varint);
+
+
+cqlsh:dharam_taget> insert into user_profile(id,first_name,last_name,slary) values(1,'Dharam','Kushwaha',1234);
+cqlsh:dharam_taget> insert into user_profile(id,first_name,last_name,slary) values(2,'Venu','Kushwaha',1234);
+cqlsh:dharam_taget> insert into user_profile(id,first_name,last_name,slary) values(3,'Dinesh','Kushwaha',1334);
+cqlsh:dharam_taget> insert into user_profile(id,first_name,last_name,slary) values(3,'Dinesh','Kushwaha',1334);
+cqlsh:dharam_taget> select * from user_profile;
+
+ id | first_name | last_name | slary
+----+------------+-----------+-------
+  1 |     Dharam |  Kushwaha |  1234
+  2 |       Venu |  Kushwaha |  1234
+  3 |     Dinesh |  Kushwaha |  1334
+  
+  
+  DROPING COLUMN
+  ALTER TABLE USER_PROFILE DROP SLARY;
+cqlsh:dharam_taget> ALTER TABLE USER_PROFILE DROP SLARY;
+cqlsh:dharam_taget> select * From user_Profile;
+
+ id | first_name | last_name
+----+------------+-----------
+  1 |     Dharam |  Kushwaha
+  2 |       Venu |  Kushwaha
+  3 |     Dinesh |  Kushwaha
+
+(3 rows)
+
+=== add column 
+cqlsh:dharam_taget> ALTER TABLE USER_PROFILE ADD SALARY text;
+cqlsh:dharam_taget> select * From user_Profile;
+
+ id | first_name | last_name | salary
+----+------------+-----------+--------
+  1 |     Dharam |  Kushwaha |   null
+  2 |       Venu |  Kushwaha |   null
+  3 |     Dinesh |  Kushwaha |   null
+
+(3 rows)
+
+
+==== 
+==== SSTable === (Ever
+hadoop@ip-172-31-93-33:/var/lib/cassandra/data/dharam_taget/user_profile-852dd9b0687f11e8b690c51e38ab131b$ ls
+backups  mc-1-big-CompressionInfo.db  mc-1-big-Data.db  mc-1-big-Digest.crc32  mc-1-big-Filter.db  mc-1-big-Index.db  mc-1-big-Statistics.db  mc-1-big-Summary.db  mc-1-big-TOC.txt  
+  
+==== after inserting data but before flush 
+hadoop@ip-172-31-93-33:/var/lib/cassandra/data/dharam_taget$ cd user_profile-852dd9b0687f11e8b690c51e38ab131b/
+hadoop@ip-172-31-93-33:/var/lib/cassandra/data/dharam_taget/user_profile-852dd9b0687f11e8b690c51e38ab131b$ ls -altr
+total 48
+drwxr-xr-x 2 cassandra cassandra 4096 Jun  5 05:15 backups
+drwxr-xr-x 3 cassandra cassandra 4096 Jun  5 05:15 ..
+-rw-r--r-- 1 cassandra cassandra   16 Jun  5 05:38 mc-1-big-Filter.db
+-rw-r--r-- 1 cassandra cassandra   56 Jun  5 05:38 mc-1-big-Summary.db
+-rw-r--r-- 1 cassandra cassandra   24 Jun  5 05:38 mc-1-big-Index.db
+-rw-r--r-- 1 cassandra cassandra  102 Jun  5 05:38 mc-1-big-Data.db
+-rw-r--r-- 1 cassandra cassandra 4721 Jun  5 05:38 mc-1-big-Statistics.db
+-rw-r--r-- 1 cassandra cassandra   10 Jun  5 05:38 mc-1-big-Digest.crc32
+-rw-r--r-- 1 cassandra cassandra   43 Jun  5 05:38 mc-1-big-CompressionInfo.db
+-rw-r--r-- 1 cassandra cassandra   92 Jun  5 05:38 mc-1-big-TOC.txt
+drwxr-xr-x 3 cassandra cassandra 4096 Jun  5 05:38 .
+
+====== after flush
+
+hadoop@ip-172-31-93-33:/var/lib/cassandra/data/dharam_taget/user_profile-852dd9b0687f11e8b690c51e38ab131b$ nodetool flush
+hadoop@ip-172-31-93-33:/var/lib/cassandra/data/dharam_taget/user_profile-852dd9b0687f11e8b690c51e38ab131b$ ls -altr
+total 84
+drwxr-xr-x 2 cassandra cassandra 4096 Jun  5 05:15 backups
+drwxr-xr-x 3 cassandra cassandra 4096 Jun  5 05:15 ..
+-rw-r--r-- 1 cassandra cassandra   16 Jun  5 05:38 mc-1-big-Filter.db
+-rw-r--r-- 1 cassandra cassandra   56 Jun  5 05:38 mc-1-big-Summary.db
+-rw-r--r-- 1 cassandra cassandra   24 Jun  5 05:38 mc-1-big-Index.db
+-rw-r--r-- 1 cassandra cassandra  102 Jun  5 05:38 mc-1-big-Data.db
+-rw-r--r-- 1 cassandra cassandra 4721 Jun  5 05:38 mc-1-big-Statistics.db
+-rw-r--r-- 1 cassandra cassandra   10 Jun  5 05:38 mc-1-big-Digest.crc32
+-rw-r--r-- 1 cassandra cassandra   43 Jun  5 05:38 mc-1-big-CompressionInfo.db
+-rw-r--r-- 1 cassandra cassandra   92 Jun  5 05:38 mc-1-big-TOC.txt
+-rw-r--r-- 1 cassandra cassandra   16 Jun  5 08:16 mc-2-big-Filter.db
+-rw-r--r-- 1 cassandra cassandra   56 Jun  5 08:16 mc-2-big-Summary.db
+-rw-r--r-- 1 cassandra cassandra    8 Jun  5 08:16 mc-2-big-Index.db
+-rw-r--r-- 1 cassandra cassandra   55 Jun  5 08:16 mc-2-big-Data.db
+-rw-r--r-- 1 cassandra cassandra   10 Jun  5 08:16 mc-2-big-Digest.crc32
+-rw-r--r-- 1 cassandra cassandra   43 Jun  5 08:16 mc-2-big-CompressionInfo.db
+-rw-r--r-- 1 cassandra cassandra   92 Jun  5 08:16 mc-2-big-TOC.txt
+-rw-r--r-- 1 cassandra cassandra 4711 Jun  5 08:16 mc-2-big-Statistics.db
+drwxr-xr-x 3 cassandra cassandra 4096 Jun  5 08:16 .
+
+==== after node tool compact  == SSTABLE merged ===
+
+hadoop@ip-172-31-93-33:/var/lib/cassandra/data/dharam_taget/user_profile-852dd9b0687f11e8b690c51e38ab131b$ nodetool compact;
+hadoop@ip-172-31-93-33:/var/lib/cassandra/data/dharam_taget/user_profile-852dd9b0687f11e8b690c51e38ab131b$ ls -altr
+total 48
+drwxr-xr-x 2 cassandra cassandra 4096 Jun  5 05:15 backups
+drwxr-xr-x 3 cassandra cassandra 4096 Jun  5 05:15 ..
+-rw-r--r-- 1 cassandra cassandra   33 Jun  5 08:17 mc-3-big-Index.db
+-rw-r--r-- 1 cassandra cassandra   16 Jun  5 08:17 mc-3-big-Filter.db
+-rw-r--r-- 1 cassandra cassandra   56 Jun  5 08:17 mc-3-big-Summary.db
+-rw-r--r-- 1 cassandra cassandra   10 Jun  5 08:17 mc-3-big-Digest.crc32
+-rw-r--r-- 1 cassandra cassandra  145 Jun  5 08:17 mc-3-big-Data.db
+-rw-r--r-- 1 cassandra cassandra   51 Jun  5 08:17 mc-3-big-CompressionInfo.db
+-rw-r--r-- 1 cassandra cassandra 4797 Jun  5 08:17 mc-3-big-Statistics.db
+-rw-r--r-- 1 cassandra cassandra   92 Jun  5 08:17 mc-3-big-TOC.txt
+drwxr-xr-x 3 cassandra cassandra 4096 Jun  5 08:17 .

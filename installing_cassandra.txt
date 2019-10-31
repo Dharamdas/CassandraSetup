@@ -43,7 +43,6 @@
   
   ##########
   Setting up multi node cluster
-  http://whatizee.blogspot.com/2015/03/creating-multi-node-cassandra-cluster.html
 yum -y update
 sudo yum install wget
 
@@ -53,14 +52,16 @@ sudo yum install wget
            # passwd cassandra
           b). Generate ssh gen private and public key and copy to each cassandra user.
                ssh-keygen -t rsa
-               cat .ssh/id_rsa.pub
+               cat .ssh/id_rsa.pub -> client m/c .ssh/authorized_keys
           c). Variffy the password less ssh login
                #ssh cassandra@ipAddress
                If login is successfufll then we are good to start C* instalation
-               
+    Install JDK
+    yum install java-1.8.0-openjdk.x86_64
     Step-2: Install C* in each machine
     cd /opt
     wget http://mirrors.estointernet.in/apache/cassandra/3.0.19/apache-cassandra-3.0.19-bin.tar.gz
+    tar xvzf apache-cassandra-3.0.19-bin.tar.gz -C /opt
 
 Extracting Files to opt and creating a link.    
 [root@T]# sudo ln -s /opt/apache-cassandra-3.0.19 /opt/cassandra
@@ -77,6 +78,16 @@ Creating Required Directories.
 
 # sudo mkdir -p /data1/cassandra/saved_cahe
 # chown cassandra:cassandra -R /data1/cassandra/saved_cahe
+
+#Below are the Reference Link
+
+https://www.digitalocean.com/community/tutorials/how-to-configure-a-multi-node-cluster-with-cassandra-on-a-ubuntu-vps
+https://www.datastax.com/documentation/cassandra/1.2/cassandra/initialize/initializeSingleDS.html
+http://www.rackspace.com/knowledge_center/article/centos-hostname-change
+http://www.datastax.com/documentation/cassandra/2.0/cassandra/initialize/initializeSingleDS.html
+http://www.datastax.com/documentation/cassandra/2.1/cassandra/configuration/configCassandra_yaml_r.html
+http://whatizee.blogspot.in/2013/12/passwordless-login-from-ahmedamd-to.html?q=passwordless
+http://whatizee.blogspot.com/2015/03/creating-multi-node-cassandra-cluster.html
            
                
   

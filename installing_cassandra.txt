@@ -41,6 +41,45 @@
   rm -rf /var/lib/cassandra/data/*
   nodetool status
   
+  ##########
+  Setting up multi node cluster
+  http://whatizee.blogspot.com/2015/03/creating-multi-node-cassandra-cluster.html
+yum -y update
+sudo yum install wget
+
+  Step-1: Enable Pwd less SSH login
+          a). Create User in each machine
+           # useradd cassandra
+           # passwd cassandra
+          b). Generate ssh gen private and public key and copy to each cassandra user.
+               ssh-keygen -t rsa
+               cat .ssh/id_rsa.pub
+          c). Variffy the password less ssh login
+               #ssh cassandra@ipAddress
+               If login is successfufll then we are good to start C* instalation
+               
+    Step-2: Install C* in each machine
+    cd /opt
+    wget http://mirrors.estointernet.in/apache/cassandra/3.0.19/apache-cassandra-3.0.19-bin.tar.gz
+
+Extracting Files to opt and creating a link.    
+[root@T]# sudo ln -s /opt/apache-cassandra-3.0.19 /opt/cassandra
+[root@T]# chown cassandra:cassandra -R /opt/cassandra
+[root@T]# chown cassandra:cassandra -R /opt/apache-cassandra-3.0.19
+
+Creating Required Directories.
+
+# sudo mkdir -p /data1/cassandra/commitlog
+# chown cassandra:cassandra -R /data1/cassandra/commitlog
+
+# sudo mkdir -p /data1/cassandra/data
+# chown cassandra:cassandra -R /data1/cassandra/data
+
+# sudo mkdir -p /data1/cassandra/saved_cahe
+# chown cassandra:cassandra -R /data1/cassandra/saved_cahe
+           
+               
+  
   
   
  
